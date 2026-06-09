@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이어폰 소비 유형 테스트 | 대구국제고등학교 사회과제연구</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg: #FDF7F7;
+    --surface: #FFFFFF;
+    --primary: #2D2D2D;
+    --accent: #E8557A;
+    --accent-light: #FDE8EE;
+    --accent-dark: #C73E62;
+    --muted: #8A8A8A;
+    --border: #EDE0E3;
+    --success: #3DBE7A;
+    --radius: 16px;
+    --shadow: 0 2px 16px rgba(232,85,122,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--primary);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* ── 헤더 ── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner {
+    max-width: 680px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header h1 { font-size: 14px; font-weight: 600; letter-spacing: -0.3px; color: var(--primary); }
+  .header-badge {
+    font-size: 11px; font-weight: 700;
+    color: var(--accent); letter-spacing: 0.3px;
+  }
+  .progress-wrap { display: flex; align-items: center; gap: 8px; }
+  .progress-bar {
+    width: 100px; height: 5px;
+    background: var(--border); border-radius: 99px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent);
+    border-radius: 99px; transition: width .4s ease;
+    width: 0%;
+  }
+  .progress-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+  /* ── 컨테이너 ── */
+  .container { max-width: 680px; margin: 0 auto; padding: 32px 20px 0; }
+
+  /* ── 인트로 ── */
+  .intro-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 40px 36px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .intro-badge {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 12px; font-weight: 700;
+    padding: 5px 14px; border-radius: 99px;
+    margin-bottom: 20px;
+    letter-spacing: 0.3px;
+  }
+  .intro-card h2 {
+    font-size: 24px; font-weight: 700;
+    line-height: 1.4; letter-spacing: -0.8px;
+    margin-bottom: 12px;
+  }
+  .intro-card p {
+    font-size: 14px; color: var(--muted);
+    line-height: 1.75; margin-bottom: 28px;
+  }
+  .intro-meta {
+    display: flex; gap: 16px; justify-content: center;
+    margin-bottom: 32px; flex-wrap: wrap;
+  }
+  .intro-meta span {
+    font-size: 12px; color: var(--muted);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .start-btn {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    padding: 15px 40px;
+    border-radius: 99px;
+    font-size: 15px; font-weight: 700;
+    border: none; cursor: pointer;
+    letter-spacing: -0.2px;
+    transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 4px 20px rgba(232,85,122,.35);
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(232,85,122,.45); }
+
+  /* ── 안내 모달 ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 200;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 36px 32px;
+    max-width: 520px; width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal-title {
+    font-size: 18px; font-weight: 700;
+    letter-spacing: -0.5px; margin-bottom: 20px;
+    color: var(--primary);
+  }
+  .notice-section {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+  .notice-section p {
+    font-size: 13px; line-height: 1.7; color: var(--primary);
+  }
+  .notice-section strong { font-weight: 700; }
+  .notice-list {
+    margin: 16px 0;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .notice-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 13px; line-height: 1.65; color: var(--primary);
+  }
+  .notice-num {
+    background: var(--accent); color: white;
+    width: 20px; height: 20px; border-radius: 50%;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .warning-box {
+    background: #FFF3CD;
+    border: 1px solid #FFD700;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 16px 0;
+    font-size: 13px; font-weight: 600;
+    color: #856404;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .consent-check-wrap {
+    display: flex; align-items: flex-start; gap: 10px;
+    margin: 20px 0 24px;
+    cursor: pointer;
+  }
+  .consent-check {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 5px; flex-shrink: 0;
+    margin-top: 1px; cursor: pointer;
+    accent-color: var(--accent);
+  }
+  .consent-check-label {
+    font-size: 13px; line-height: 1.6; cursor: pointer;
+  }
+  .modal-start-btn {
+    display: block; width: 100%;
+    background: var(--accent); color: white;
+    padding: 14px; border-radius: 12px;
+    font-size: 15px; font-weight: 700;
+    border: none; cursor: pointer;
+    transition: all .15s;
+    opacity: .4; pointer-events: none;
+  }
+  .modal-start-btn.active { opacity: 1; pointer-events: auto; }
+  .modal-start-btn.active:hover { background: var(--accent-dark); }
+
+  /* ── 섹션 헤더 ── */
+  .section-header {
+    margin: 36px 0 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-tag {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 6px;
+    letter-spacing: 0.5px;
+  }
+  .section-title { font-size: 16px; font-weight: 700; letter-spacing: -0.4px; }
+  .section-desc {
+    font-size: 13px; color: var(--muted);
+    margin-bottom: 20px; line-height: 1.65;
+    background: var(--surface);
+    padding: 12px 16px; border-radius: 10px;
+    border-left: 3px solid var(--accent-light);
+  }
+
+  /* ── 질문 카드 ── */
+  .question-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    border: 2px solid transparent;
+    transition: border-color .2s;
+  }
+  .question-card.answered { border-color: var(--accent-light); }
+  .q-number {
+    font-size: 11px; font-weight: 700;
+    color: var(--accent); letter-spacing: 0.5px; margin-bottom: 7px;
+  }
+  .q-text {
+    font-size: 14px; font-weight: 500;
+    line-height: 1.6; letter-spacing: -0.2px; margin-bottom: 14px;
+  }
+
+  /* ── 리커트 ── */
+  .likert-wrap { display: flex; gap: 5px; }
+  .likert-labels {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; font-size: 10px; color: var(--muted);
+  }
+  .likert-btn {
+    flex: 1; padding: 10px 2px;
+    border: 2px solid var(--border);
+    border-radius: 10px; background: var(--bg);
+    cursor: pointer; font-size: 13px; font-weight: 600;
+    color: var(--muted); transition: all .15s; text-align: center;
+  }
+  .likert-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .likert-btn.selected { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* ── 라디오 ── */
+  .radio-group { display: flex; flex-direction: column; gap: 7px; }
+  .radio-btn {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    border: 2px solid var(--border); border-radius: 12px;
+    background: var(--bg); cursor: pointer; font-size: 13px;
+    transition: all .15s;
+  }
+  .radio-btn:hover { border-color: var(--accent); background: var(--accent-light); }
+  .radio-btn.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 600; }
+  .radio-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; transition: all .15s;
+  }
+  .radio-btn.selected .radio-dot { border-color: var(--accent); background: var(--accent); }
+  .radio-btn.selected .radio-dot::after { content: ''; width: 5px; height: 5px; background: white; border-radius: 50%; }
+
+  /* ── 제출 ── */
+  .submit-section { margin-top: 32px; text-align: center; }
+  .submit-btn {
+    background: var(--primary); color: white;
+    padding: 16px 48px; border-radius: 99px;
+    font-size: 15px; font-weight: 700; border: none; cursor: pointer;
+    opacity: .4; pointer-events: none; transition: all .15s;
+  }
+  .submit-btn.active { opacity: 1; pointer-events: auto; box-shadow: 0 4px 20px rgba(0,0,0,.2); }
+  .submit-btn.active:hover { transform: translateY(-2px); }
+  .submit-hint { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+  /* ── 로딩 ── */
+  .loading-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(253,247,247,.95); z-index: 999;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+  }
+  .loading-overlay.show { display: flex; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── 결과 ── */
+  .result-screen { display: none; }
+  .result-screen.show { display: block; }
+  .result-hero {
+    background: linear-gradient(135deg, var(--accent) 0%, #F08DAA 100%);
+    border-radius: var(--radius); padding: 40px 32px;
+    text-align: center; color: white; margin-bottom: 16px;
+    box-shadow: 0 8px 32px rgba(232,85,122,.3);
+  }
+  .result-emoji { font-size: 52px; margin-bottom: 12px; }
+  .result-type-label { font-size: 11px; font-weight: 700; opacity: .8; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  .result-type-name { font-size: 26px; font-weight: 700; letter-spacing: -0.8px; margin-bottom: 14px; }
+  .result-type-desc { font-size: 13px; line-height: 1.8; opacity: .92; }
+  .result-section {
+    background: var(--surface); border-radius: var(--radius);
+    padding: 24px; margin-bottom: 12px; box-shadow: var(--shadow);
+  }
+  .result-section-title { font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .brand-type-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px; border-radius: 12px; background: var(--bg); margin-bottom: 8px;
+  }
+  .brand-type-emoji { font-size: 28px; }
+  .brand-type-info h4 { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+  .brand-type-info p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .score-bar-wrap { margin-bottom: 12px; }
+  .score-bar-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+  .score-bar-label span:last-child { font-weight: 700; color: var(--accent); }
+  .score-bar-bg { height: 7px; background: var(--bg); border-radius: 99px; overflow: hidden; }
+  .score-bar-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width 1s ease; }
+  .share-btn {
+    display: block; width: 100%;
+    background: var(--accent-light); color: var(--accent);
+    padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 700;
+    border: none; cursor: pointer; text-align: center; margin-bottom: 10px; transition: all .15s;
+  }
+  .share-btn:hover { background: var(--accent); color: white; }
+  .done-note { text-align: center; margin-top: 20px; font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  @media (max-width: 480px) {
+    .intro-card { padding: 28px 18px; }
+    .intro-card h2 { font-size: 20px; }
+    .modal-box { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <div class="header-badge">대구국제고등학교 사회과제연구</div>
+      <h1>이어폰 소비 유형 설문</h1>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="progress-label" id="progressLabel">0%</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 인트로 -->
+  <div id="introSection">
+    <div class="intro-card">
+      <div class="intro-badge">대구국제고등학교 사회과제연구 2026</div>
+      <h2>나는 어떤 소비자일까?<br>이어폰 구매 유형 테스트</h2>
+      <p>브랜드 개성 인식과 합리적 소비생활의 관계를 분석하는<br>사회과제연구의 일환입니다.<br>솔직하게 응답할수록 더 정확한 결과를 확인할 수 있어요!</p>
+      <div class="intro-meta">
+        <span>⏱ 약 5~7분</span>
+        <span>🔒 익명 보장</span>
+        <span>📊 소비 유형 결과 제공</span>
+      </div>
+      <button class="start-btn" onclick="openNotice()">시작하기 →</button>
+    </div>
+  </div>
+
+  <!-- 설문 본문 -->
+  <div id="surveySection" style="display:none">
+
+    <!-- PART 0: 기본 정보 -->
+    <div class="section-header">
+      <span class="section-tag">기본 정보</span>
+      <span class="section-title">응답자 정보</span>
+    </div>
+    <div class="section-desc">아래 문항은 연구 결과 분석을 위한 기본 정보입니다. 이름 등 개인을 식별할 수 있는 정보는 수집하지 않습니다.</div>
+
+    <div class="question-card" id="qcard_grade">
+      <div class="q-number">Q1</div>
+      <div class="q-text">학년을 선택해 주세요.</div>
+      <div class="radio-group">
+        <div class="radio-btn" onclick="selectRadio('grade','1학년')"><div class="radio-dot"></div>1학년</div>
+        <div class="radio-btn" onclick="selectRadio('grade','2학년')"><div class="radio-dot"></div>2학년</div>
+        <div class="radio-btn" onclick="selectRadio('grade','3학년')"><div class="radio-dot"></div>3학년</div>
+      </div>
+    </div>
+
+    <div class="question-card" id="qcard_gender">
+      <div class="q-number">Q2</div>
+      <div class="q-text">성별을 선택해 주세요.</div>
+      <div class="radio-group">
+        <div class="radio-btn" onclick="selectRadio('gender','남성')"><div class="radio-dot"></div>남성</div>
+        <div class="radio-btn" onclick="selectRadio('gender','여성')"><div class="radio-dot"></div>여성</div>
+        <div class="radio-btn" onclick="selectRadio('gender','응답 안 함')"><div class="radio-dot"></div>응답 안 함</div>
+      </div>
+    </div>
+
+    <div class="question-card" id="qcard_brand">
+      <div class="q-number">Q3</div>
+      <div class="q-text">현재 주로 사용하는 무선이어폰의 브랜드는 무엇인가요?</div>
+      <div class="radio-group">
+        <div class="radio-btn" onclick="selectRadio('brand','Apple (AirPods)')"><div class="radio-dot"></div>Apple (AirPods)</div>
+        <div class="radio-btn" onclick="selectRadio('brand','Samsung (Galaxy Buds)')"><div class="radio-dot"></div>Samsung (Galaxy Buds)</div>
+        <div class="radio-btn" onclick="selectRadio('brand','Sony')"><div class="radio-dot"></div>Sony</div>
+        <div class="radio-btn" onclick="selectRadio('brand','JBL')"><div class="radio-dot"></div>JBL</div>
+        <div class="radio-btn" onclick="selectRadio('brand','Bose')"><div class="radio-dot"></div>Bose</div>
+        <div class="radio-btn" onclick="selectRadio('brand','QCY')"><div class="radio-dot"></div>QCY</div>
+        <div class="radio-btn" onclick="selectRadio('brand','기타')"><div class="radio-dot"></div>기타</div>
+      </div>
+    </div>
+
+    <div class="question-card" id="qcard_decision">
+      <div class="q-number">Q4</div>
+      <div class="q-text">이 무선이어폰의 브랜드를 선택할 때 본인의 의사가 얼마나 반영되었나요?</div>
+      <div class="likert-wrap" id="likert_decision"></div>
+      <div class="likert-labels"><span>전혀 반영되지 않음</span><span>완전히 내가 결정</span></div>
+    </div>
+
+    <!-- PART 1: 평소 합리적 소비 성향 -->
+    <div class="section-header">
+      <span class="section-tag">PART 1</span>
+      <span class="section-title">평소 소비 성향</span>
+    </div>
+    <div class="section-desc">
+      평소 물건을 구매할 때의 일반적인 습관에 대해 응답해 주세요.<br>
+      <strong>1 = 전혀 그렇지 않다 &nbsp;·&nbsp; 3 = 보통이다 &nbsp;·&nbsp; 5 = 매우 그렇다</strong>
+    </div>
+    <div id="habit-questions"></div>
+
+    <!-- PART 2: 브랜드 개성 인식 -->
+    <div class="section-header">
+      <span class="section-tag">PART 2</span>
+      <span class="section-title">현재 사용 중인 무선이어폰 브랜드 이미지</span>
+    </div>
+    <div class="section-desc">
+      현재 사용 중인 무선이어폰 브랜드에 대한 이미지를 응답해 주세요. 정답은 없으며, 평소 느끼는 이미지를 그대로 답해 주시면 됩니다.<br>
+      <strong>1 = 전혀 그렇지 않다 &nbsp;·&nbsp; 3 = 보통이다 &nbsp;·&nbsp; 5 = 매우 그렇다</strong>
+    </div>
+    <div id="brand-questions"></div>
+
+    <!-- PART 3: 구매 당시 합리성 -->
+    <div class="section-header">
+      <span class="section-tag">PART 3</span>
+      <span class="section-title">이 무선이어폰을 구매할 당시</span>
+    </div>
+    <div class="section-desc">
+      현재 사용 중인 무선이어폰을 구매하던 당시 상황을 떠올리며 응답해 주세요. 평소 소비 습관이 아니라, 실제로 해당 무선이어폰을 구매할 당시의 행동을 기준으로 응답해 주세요.<br>
+      <strong>1 = 전혀 그렇지 않다 &nbsp;·&nbsp; 3 = 보통이다 &nbsp;·&nbsp; 5 = 매우 그렇다</strong>
+    </div>
+    <div id="purchase-questions"></div>
+
+    <!-- 제출 -->
+    <div class="submit-section">
+      <button class="submit-btn" id="submitBtn" onclick="submitSurvey()">결과 확인하기 ✨</button>
+      <p class="submit-hint" id="submitHint">모든 문항에 응답하면 활성화됩니다</p>
+    </div>
+  </div>
+
+  <!-- 결과 화면 -->
+  <div id="resultSection" class="result-screen">
+    <div class="result-hero">
+      <div class="result-emoji" id="resultEmoji"></div>
+      <div class="result-type-label">나의 소비 유형</div>
+      <div class="result-type-name" id="resultTypeName"></div>
+      <div class="result-type-desc" id="resultTypeDesc"></div>
+    </div>
+    <div class="result-section">
+      <div class="result-section-title">📊 브랜드 인식 유형</div>
+      <div class="brand-type-card">
+        <div class="brand-type-emoji" id="brandEmoji"></div>
+        <div class="brand-type-info">
+          <h4 id="brandTypeName"></h4>
+          <p id="brandTypeDesc"></p>
+        </div>
+      </div>
+    </div>
+    <div class="result-section">
+      <div class="result-section-title">📈 내 소비 성향 점수</div>
+      <div id="scoreBarContainer"></div>
+    </div>
+    <div class="result-section">
+      <button class="share-btn" onclick="copyLink()">🔗 설문 링크 복사하기</button>
+      <div class="done-note">
+        응답해 주셔서 감사합니다!<br>
+        수집된 데이터는 대구국제고등학교 사회과제연구에만 활용됩니다.<br>
+        <small style="font-size:11px;margin-top:6px;display:block">3학년 6반 11번 이지우</small>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- 안내 모달 -->
+<div class="modal-overlay" id="noticeModal">
+  <div class="modal-box">
+    <div class="modal-title">📋 설문 참여 전 안내사항</div>
+
+    <div class="notice-section">
+      <p><strong>본 설문은 「브랜드 개성이 청소년의 합리적 소비생활에 미치는 영향」 연구를 위한 자료 수집을 목적으로 작성되었습니다.</strong><br>각 문항에는 정답이 없으며, 평소의 생각과 경험에 따라 자연스럽게 응답해 주시면 됩니다.</p>
+    </div>
+
+    <div class="warning-box">
+      &#9888; 본 설문은 <strong>무선이어폰을 보유하고 있는 분들</strong>을 대상으로 합니다. 현재 무선이어폰이 없으신 분들은 참여를 삼가 주세요.
+    </div>
+
+    <div class="notice-list">
+      <div class="notice-item">
+        <div class="notice-num">1</div>
+        <span>응답하신 모든 내용은 <strong>익명으로 처리</strong>되며, 수집된 자료는 <strong>통계 분석 및 학술 연구 목적으로만</strong> 활용됩니다.</span>
+      </div>
+      <div class="notice-item">
+        <div class="notice-num">2</div>
+        <span>설문 참여는 <strong>자발적</strong>이며, 응답 중 언제든지 참여를 중단할 수 있습니다.</span>
+      </div>
+      <div class="notice-item">
+        <div class="notice-num">3</div>
+        <span>전체 문항은 약 <strong>24문항</strong>이며, 소요 시간은 약 <strong>3~5분</strong>입니다. 마지막 문항까지 성실하게 응답해 주시기 바랍니다.</span>
+      </div>
+      <div class="notice-item">
+        <div class="notice-num">4</div>
+        <span>문항에 제시된 <strong>응답 방법:</strong> 각 문항을 읽고 본인의 생각과 가장 가까운 숫자에 표시해 주세요. (1 = 전혀 그렇지 않다 ~ 5 = 매우 그렇다)</span>
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;padding:10px 12px;background:var(--bg);border-radius:8px;">
+      대구국제고등학교 3학년 6반 11번 이지우<br>
+      문의: <em>24084@dhi.hs.kr</em>
+    </div>
+
+    <label class="consent-check-wrap">
+      <input type="checkbox" class="consent-check" id="consentCheck" onchange="toggleConsent()">
+      <span class="consent-check-label">위 내용을 모두 확인하였으며, 무선이어폰을 보유한 상태로 본 연구에 자발적으로 참여하는 것에 동의합니다.</span>
+    </label>
+
+    <button class="modal-start-btn" id="modalStartBtn" onclick="startSurvey()">동의하고 설문 시작하기 →</button>
+  </div>
+</div>
+
+<!-- 로딩 -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p style="font-size:14px;color:var(--muted)">결과를 분석하는 중...</p>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  Google Apps Script URL (배포 후 교체)
+// ══════════════════════════════════════════
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbweWQRjM3GZDDuVqo29wGHGOeS8FqNzwYQX-uPU2B15EKXwFiAX54GPFqxAhHI3XpjD/exec";
+
+// ══════════════════════════════════════════
+//  문항 데이터
+// ══════════════════════════════════════════
+
+// PART 1: 평소 합리적 소비 성향 (김시월 & 노영래, 2007 수정)
+const habitQuestions = [
+  { id: "h1", text: "물건을 구매하기 전에 여러 곳을 비교하며 구입한다." },
+  { id: "h2", text: "상품을 구매할 때 품질과 가격을 우선 고려한다." },
+  { id: "h3", text: "상품을 구매할 때 사전에 계획을 세우고 금전적 상황을 고려한다." },
+  { id: "h4", text: "물건을 구매하기 전에 상품 정보를 미리 알아보는 편이다." },
+  { id: "h5", text: "구입할 때 지금 유행하는 브랜드보다 나에게 필요한 것을 기준으로 구매한다." },
+  { id: "h6", text: "무엇인가를 산 후에 왜 그것을 샀는지 모를 때가 있다.", reverse: true },
+];
+
+// PART 2: 브랜드 개성 인식 (Aaker, 1997 수정 — 차원별 2문항)
+const brandQuestions = [
+  // 진정성
+  { id: "b_sin1", text: "이 브랜드는 믿을 수 있고 신뢰감 있는 이미지다.", dim: "sincerity" },
+  { id: "b_sin2", text: "이 브랜드는 친근하고 따뜻한 이미지다.", dim: "sincerity" },
+  // 흥분
+  { id: "b_exc1", text: "이 브랜드는 트렌디하고 활기찬 이미지다.", dim: "excitement" },
+  { id: "b_exc2", text: "이 브랜드는 개성 있고 독창적인 이미지다.", dim: "excitement" },
+  // 능력
+  { id: "b_com1", text: "이 브랜드는 기술력이 뛰어나고 성능이 우수한 이미지다.", dim: "competence" },
+  { id: "b_com2", text: "이 브랜드는 신뢰할 수 있는 품질의 이미지다.", dim: "competence" },
+  // 세련됨
+  { id: "b_sop1", text: "이 브랜드는 고급스럽고 세련된 이미지다.", dim: "sophistication" },
+  { id: "b_sop2", text: "이 브랜드는 격조 있고 우아한 이미지다.", dim: "sophistication" },
+];
+
+// PART 3: 구매 합리성 (김시월 & 노영래, 2007 수정 — 6문항)
+const purchaseQuestions = [
+  { id: "p1", text: "구매 전 여러 브랜드를 비교하였다.", reverse: false },
+  { id: "p2", text: "가격 대비 품질을 충분히 고려하였다.", reverse: false },
+  { id: "p3", text: "구매 전 제품 정보를 충분히 검색해보았다.", reverse: false },
+  { id: "p4", text: "현재 유행하는 브랜드보다 내게 필요한 제품인지를 기준으로 구매하였다.", reverse: false },
+  { id: "p5", text: "브랜드 이미지 때문에 예산을 초과하여 구매하였다.", reverse: true },
+  { id: "p6", text: "할인 여부를 확인하고 구매하였다.", reverse: false },
+];
+
+// ══════════════════════════════════════════
+//  상태
+// ══════════════════════════════════════════
+const answers = {};
+let totalQuestions = 0;
+
+// ══════════════════════════════════════════
+//  모달 & 시작
+// ══════════════════════════════════════════
+function openNotice() {
+  document.getElementById('noticeModal').classList.add('show');
+}
+function toggleConsent() {
+  const checked = document.getElementById('consentCheck').checked;
+  const btn = document.getElementById('modalStartBtn');
+  btn.classList.toggle('active', checked);
+}
+function startSurvey() {
+  document.getElementById('noticeModal').classList.remove('show');
+  document.getElementById('introSection').style.display = 'none';
+  document.getElementById('surveySection').style.display = 'block';
+
+  buildLikert('likert_decision', 'decision');
+  renderLikert('habit-questions', habitQuestions, 5);
+  renderLikert('brand-questions', brandQuestions, 11);
+  renderLikert('purchase-questions', purchaseQuestions, 19);
+
+  totalQuestions = 4
+    + habitQuestions.length
+    + brandQuestions.length
+    + purchaseQuestions.length;
+  updateProgress();
+  window.scrollTo({ top: 0 });
+}
+
+// ══════════════════════════════════════════
+//  렌더링
+// ══════════════════════════════════════════
+function renderLikert(containerId, questions, startNum) {
+  const container = document.getElementById(containerId);
+  questions.forEach((q, i) => {
+    const num = startNum + i;
+    const div = document.createElement('div');
+    div.className = 'question-card';
+    div.id = `qcard_${q.id}`;
+    div.innerHTML = `
+      <div class="q-number">Q${num}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="likert-wrap" id="likert_${q.id}"></div>
+      <div class="likert-labels"><span>전혀 그렇지 않다</span><span>매우 그렇다</span></div>`;
+    container.appendChild(div);
+    buildLikert(`likert_${q.id}`, q.id);
+  });
+}
+function buildLikert(containerId, qId) {
+  const wrap = document.getElementById(containerId);
+  for (let v = 1; v <= 5; v++) {
+    const btn = document.createElement('button');
+    btn.className = 'likert-btn';
+    btn.textContent = v;
+    btn.onclick = () => selectLikert(qId, v, wrap);
+    wrap.appendChild(btn);
+  }
+}
+
+// ══════════════════════════════════════════
+//  답변
+// ══════════════════════════════════════════
+function selectLikert(qId, value, wrap) {
+  [...wrap.children].forEach(b => b.classList.remove('selected'));
+  wrap.children[value - 1].classList.add('selected');
+  answers[qId] = value;
+  document.getElementById(`qcard_${qId}`)?.classList.add('answered');
+  updateProgress();
+}
+function selectRadio(qId, value) {
+  answers[qId] = value;
+  const card = document.getElementById(`qcard_${qId}`);
+  card.querySelectorAll('.radio-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.value === value);
+  });
+  card.classList.add('answered');
+  updateProgress();
+}
+function updateProgress() {
+  const filled = Object.keys(answers).length;
+  const pct = Math.round((filled / totalQuestions) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = pct + '%';
+  const allDone = filled >= totalQuestions;
+  document.getElementById('submitBtn').classList.toggle('active', allDone);
+  document.getElementById('submitHint').textContent = allDone
+    ? '모든 문항에 응답하셨습니다! 결과를 확인해 보세요.'
+    : `${totalQuestions - filled}개 문항이 남았습니다`;
+}
+
+// ══════════════════════════════════════════
+//  점수 & 유형
+// ══════════════════════════════════════════
+function calcScores() {
+  const habit = habitQuestions.reduce((s, q) => {
+    const v = answers[q.id] || 3;
+    return s + (q.reverse ? (6 - v) : v);
+  }, 0) / habitQuestions.length;
+
+  const dims = { sincerity:0, excitement:0, competence:0, sophistication:0 };
+  brandQuestions.forEach(q => { dims[q.dim] += (answers[q.id] || 3); });
+  Object.keys(dims).forEach(k => dims[k] /= 2);
+
+  const purchase = purchaseQuestions.reduce((s, q) => {
+    const v = answers[q.id] || 3;
+    return s + (q.reverse ? (6 - v) : v);
+  }, 0) / purchaseQuestions.length;
+
+  return { habit, purchase, dims };
+}
+function getConsumerType(habit, purchase) {
+  const avg = (habit + purchase) / 2;
+  if (avg >= 4.0) return {
+    emoji: '🔍', name: '정보 탐색형 소비자',
+    desc: '구매를 결정하기 전에 충분한 정보를 수집하는 편입니다. 여러 제품을 비교하고, 후기를 찾아보며, 자신에게 정말 필요한 물건인지 고민합니다. 당신에게 소비는 단순히 돈을 쓰는 행위가 아니라 선택의 과정에 가깝습니다. 새로운 유행이 시작되더라도 무조건 따라가기보다는 실제로 나에게 도움이 되는지 판단하려고 하며, 구매 후 후회하는 경우는 상대적으로 적은 편입니다.'
+  };
+  if (avg >= 3.0) return {
+    emoji: '⚖️', name: '균형 추구형 소비자',
+    desc: '합리성과 감성을 적절히 조화시키는 소비자입니다. 구매 전 정보를 찾아보기도 하지만, 때로는 디자인이나 브랜드 이미지 같은 감성적 요소도 중요하게 고려합니다. 무조건 가장 저렴한 선택을 추구하지도 않고, 가장 유명한 브랜드만을 고집하지도 않습니다. 필요와 만족 사이의 균형을 찾으며, 납득할 수 있는 이유가 있다면 조금 더 비싼 제품을 선택하기도 합니다.'
+  };
+  if (avg >= 2.3) return {
+    emoji: '⚡', name: '직관적 선택형 소비자',
+    desc: '소비를 지나치게 복잡하게 생각하지 않는 편입니다. 많은 정보를 찾아보는 것보다 첫인상이나 직감을 신뢰하는 경우가 많습니다. 빠르게 결정하는 것을 선호하며, 마음에 드는 제품을 발견하면 비교적 쉽게 구매를 결정하기도 합니다. 구매 자체를 하나의 경험으로 받아들이는 경향이 있으며, 실용성뿐 아니라 감정적 만족감도 중요하게 생각합니다.'
+  };
+  return {
+    emoji: '🎯', name: '이미지 중시형 소비자',
+    desc: '제품의 기능뿐 아니라 브랜드가 전달하는 이미지와 의미를 중요하게 생각합니다. 브랜드는 단순한 로고가 아니라 자신이 추구하는 가치와 취향을 표현하는 수단이라고 느끼는 경우가 많습니다. 세련된 디자인, 높은 인지도, 긍정적인 브랜드 스토리 등이 선택에 상당한 영향을 미칩니다. 브랜드 이미지가 실제 필요성보다 더 큰 영향을 미칠 수 있습니다.'
+  };
+}
+function getBrandType(dims) {
+  const max = Object.entries(dims).sort((a, b) => b[1] - a[1])[0][0];
+  return {
+    sincerity:      { emoji: '🤝', name: '신뢰형', desc: '따뜻하고 진실된 이미지를 강하게 느끼고 있어요. 신뢰와 안정감을 브랜드 선택의 중요한 기준으로 삼는 경향이 있습니다.' },
+    excitement:     { emoji: '🚀', name: '트렌드형', desc: '트렌디하고 에너지 넘치는 브랜드 이미지에 끌리는 편이에요. 새롭고 독창적인 것을 중요하게 생각하는 소비 성향이 엿보입니다.' },
+    competence:     { emoji: '🛠️', name: '전문성형', desc: '기술력과 성능을 가장 중요하게 인식하고 있어요. 브랜드의 실질적 능력과 품질을 핵심 가치로 여기는 합리적인 면이 있습니다.' },
+    sophistication: { emoji: '✨', name: '세련형', desc: '고급스럽고 우아한 브랜드 이미지에 높은 가치를 두고 있어요. 미적 감각과 격조를 소비에서 중요하게 여기는 경향이 있습니다.' },
+  }[max];
+}
+
+// ══════════════════════════════════════════
+//  제출
+// ══════════════════════════════════════════
+async function submitSurvey() {
+  document.getElementById('loadingOverlay').classList.add('show');
+  const { habit, purchase, dims } = calcScores();
+
+  const payload = {
+    timestamp: new Date().toISOString(),
+    grade: answers.grade || '',
+    gender: answers.gender || '',
+    brand: answers.brand || '',
+    decision: answers.decision || '',
+    ...Object.fromEntries(habitQuestions.map(q => [q.id, answers[q.id] || ''])),
+    ...Object.fromEntries(brandQuestions.map(q => [q.id, answers[q.id] || ''])),
+    ...Object.fromEntries(purchaseQuestions.map(q => [q.id, answers[q.id] || ''])),
+    score_habit: habit.toFixed(2),
+    score_purchase: purchase.toFixed(2),
+    score_sincerity: dims.sincerity.toFixed(2),
+    score_excitement: dims.excitement.toFixed(2),
+    score_competence: dims.competence.toFixed(2),
+    score_sophistication: dims.sophistication.toFixed(2),
+  };
+
+  try {
+    if (!APPS_SCRIPT_URL.includes('여기에')) {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    }
+  } catch (e) { console.warn('전송 실패:', e); }
+
+  showResult(habit, purchase, dims);
+}
+
+function showResult(habit, purchase, dims) {
+  document.getElementById('loadingOverlay').classList.remove('show');
+  document.getElementById('surveySection').style.display = 'none';
+  document.getElementById('resultSection').classList.add('show');
+
+  const cType = getConsumerType(habit, purchase);
+  document.getElementById('resultEmoji').textContent = cType.emoji;
+  document.getElementById('resultTypeName').textContent = cType.name;
+  document.getElementById('resultTypeDesc').textContent = cType.desc;
+
+  const bType = getBrandType(dims);
+  document.getElementById('brandEmoji').textContent = bType.emoji;
+  document.getElementById('brandTypeName').textContent = bType.name;
+  document.getElementById('brandTypeDesc').textContent = bType.desc;
+
+  const bars = [
+    { label: '평소 합리적 소비 성향', value: habit },
+    { label: '이번 구매 합리성', value: purchase },
+    { label: '진정성 인식', value: dims.sincerity },
+    { label: '흥분(트렌드) 인식', value: dims.excitement },
+    { label: '능력(전문성) 인식', value: dims.competence },
+    { label: '세련됨 인식', value: dims.sophistication },
+  ];
+  const container = document.getElementById('scoreBarContainer');
+container.innerHTML = ''; // 딱 1번만 초기화
+
+bars.forEach(b => {
+  const pct = Math.round((b.value / 5) * 100);
+
+  container.innerHTML += `
+    <div class="score-bar-wrap">
+      <div class="score-bar-label">
+        <span>${b.label}</span>
+        <span>${b.value.toFixed(1)} / 5.0</span>
+      </div>
+      <div class="score-bar-bg">
+        <div class="score-bar-fill" style="width:${pct}%"></div>
+      </div>
+    </div>
+  `;
+});
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href)
+    .then(() => alert('링크가 복사되었습니다!'))
+    .catch(() => alert('링크: ' + window.location.href));
+}
+</script>
+</body>
+</html>
