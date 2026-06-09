@@ -391,9 +391,9 @@
       <div class="q-number">Q1</div>
       <div class="q-text">학년을 선택해 주세요.</div>
       <div class="radio-group">
-        <div class="radio-btn" onclick="selectRadio('grade','1학년')"><div class="radio-dot"></div>1학년</div>
-        <div class="radio-btn" onclick="selectRadio('grade','2학년')"><div class="radio-dot"></div>2학년</div>
-        <div class="radio-btn" onclick="selectRadio('grade','3학년')"><div class="radio-dot"></div>3학년</div>
+        <div class="radio-btn" onclick="selectRadio('grade','1학년', this)"><div class="radio-dot"></div>1학년</div>
+        <div class="radio-btn" onclick="selectRadio('grade','2학년', this)"><div class="radio-dot"></div>2학년</div>
+        <div class="radio-btn" onclick="selectRadio('grade','3학년', this)"><div class="radio-dot"></div>3학년</div>
       </div>
     </div>
 
@@ -401,9 +401,9 @@
       <div class="q-number">Q2</div>
       <div class="q-text">성별을 선택해 주세요.</div>
       <div class="radio-group">
-        <div class="radio-btn" onclick="selectRadio('gender','남성')"><div class="radio-dot"></div>남성</div>
-        <div class="radio-btn" onclick="selectRadio('gender','여성')"><div class="radio-dot"></div>여성</div>
-        <div class="radio-btn" onclick="selectRadio('gender','응답 안 함')"><div class="radio-dot"></div>응답 안 함</div>
+        <div class="radio-btn" onclick="selectRadio('gender','남성', this)"><div class="radio-dot"></div>남성</div>
+        <div class="radio-btn" onclick="selectRadio('gender','여성', this)"><div class="radio-dot"></div>여성</div>
+        <div class="radio-btn" onclick="selectRadio('gender','응답 안 함', this)"><div class="radio-dot"></div>응답 안 함</div>
       </div>
     </div>
 
@@ -411,13 +411,13 @@
       <div class="q-number">Q3</div>
       <div class="q-text">현재 주로 사용하는 무선이어폰의 브랜드는 무엇인가요?</div>
       <div class="radio-group">
-        <div class="radio-btn" onclick="selectRadio('brand','Apple (AirPods)')"><div class="radio-dot"></div>Apple (AirPods)</div>
-        <div class="radio-btn" onclick="selectRadio('brand','Samsung (Galaxy Buds)')"><div class="radio-dot"></div>Samsung (Galaxy Buds)</div>
-        <div class="radio-btn" onclick="selectRadio('brand','Sony')"><div class="radio-dot"></div>Sony</div>
-        <div class="radio-btn" onclick="selectRadio('brand','JBL')"><div class="radio-dot"></div>JBL</div>
-        <div class="radio-btn" onclick="selectRadio('brand','Bose')"><div class="radio-dot"></div>Bose</div>
-        <div class="radio-btn" onclick="selectRadio('brand','QCY')"><div class="radio-dot"></div>QCY</div>
-        <div class="radio-btn" onclick="selectRadio('brand','기타')"><div class="radio-dot"></div>기타</div>
+        <div class="radio-btn" onclick="selectRadio('brand','Apple (AirPods)', this)"><div class="radio-dot"></div>Apple (AirPods)</div>
+        <div class="radio-btn" onclick="selectRadio('brand','Samsung (Galaxy Buds)', this)"><div class="radio-dot"></div>Samsung (Galaxy Buds)</div>
+        <div class="radio-btn" onclick="selectRadio('brand','Sony', this)"><div class="radio-dot"></div>Sony</div>
+        <div class="radio-btn" onclick="selectRadio('brand','JBL', this)"><div class="radio-dot"></div>JBL</div>
+        <div class="radio-btn" onclick="selectRadio('brand','Bose', this)"><div class="radio-dot"></div>Bose</div>
+        <div class="radio-btn" onclick="selectRadio('brand','QCY', this)"><div class="radio-dot"></div>QCY</div>
+        <div class="radio-btn" onclick="selectRadio('brand','기타', this)"><div class="radio-dot"></div>기타</div>
       </div>
     </div>
 
@@ -675,16 +675,18 @@ function selectLikert(qId, value, wrap) {
   document.getElementById(`qcard_${qId}`)?.classList.add('answered');
   updateProgress();
 }
-function selectRadio(qId, value) {
+function selectRadio(qId, value, el) {
   answers[qId] = value;
 
   const card = document.getElementById(`qcard_${qId}`);
 
-  card.querySelectorAll('.radio-btn').forEach(btn => {
-    btn.classList.remove('selected');
-  });
+  if (card) {
+    card.querySelectorAll('.radio-btn').forEach(btn => {
+      btn.classList.remove('selected');
+    });
+  }
 
-  event.currentTarget.classList.add('selected');
+  el.classList.add('selected');
 
   updateProgress();
 }
