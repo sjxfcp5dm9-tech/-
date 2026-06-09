@@ -675,15 +675,17 @@ function selectLikert(qId, value, wrap) {
   document.getElementById(`qcard_${qId}`)?.classList.add('answered');
   updateProgress();
 }
-function selectRadio(qId, value, el) {
+function selectRadio(qId, value) {
   answers[qId] = value;
 
   const card = document.getElementById(`qcard_${qId}`);
+
   card.querySelectorAll('.radio-btn').forEach(btn => {
     btn.classList.remove('selected');
   });
 
-  el.classList.add('selected');
+  event.currentTarget.classList.add('selected');
+
   updateProgress();
 }
 function updateProgress() {
