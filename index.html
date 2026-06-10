@@ -779,8 +779,8 @@ async function submitSurvey() {
     if (!APPS_SCRIPT_URL.includes('여기에')) {
       await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        mode: 'no-cors',
+        body: JSON.stringify(payload)
       });
     }
   } catch (e) { console.warn('전송 실패:', e); }
